@@ -9,6 +9,7 @@ class ECGPreprocessor:
     """
 
     def __init__(self):
+        # Inizializza gli scaler separati per X e y
         self.scaler_X = StandardScaler()
         self.scaler_y = StandardScaler()
 

@@ -5,6 +5,11 @@ import pandas as pd
 from collections import defaultdict
 
 class ECGDataLoader:
+    # Inizializzazione del caricatore di dati ECG
+    # input:
+    #   - data_folder: cartella contenente i file CSV dei segnali ECG
+    #   - sequence_length: lunghezza delle sequenze da generare (per LSTM)
+    #   - sampling_rate: frequenza di campionamento dei segnali ECG
     def __init__(self, data_folder, sequence_length=128, sampling_rate=400):
         self.data_folder = data_folder
         self.sequence_length = sequence_length
@@ -18,8 +23,10 @@ class ECGDataLoader:
             'hypoventilation': 30,
             'hyperventilation': 30
         }
+        # Limiti delle fasi in base al campionamento
         self.phase_limits = self.get_phase_indices()
 
+    # Restituisce i limiti delle fasi in base alla durata e alla frequenza di campionamento
     def get_phase_indices(self):
         phase_limits = {}
         start = 0
@@ -29,6 +36,7 @@ class ECGDataLoader:
             start = end
         return phase_limits
 
+    # Carica i segnali ECG dai file CSV
     def load_signals(self):
         """Carica tutti i segnali CSV dalla cartella"""
         all_data = []
@@ -53,6 +61,7 @@ class ECGDataLoader:
                 all_data.append({'person_id': person_id, 'label': label, 'signal': signal})
         return all_data
 
+    # Organizza i segnali per persona
     def organize_by_person(self, all_data):
         """Raggruppa i segnali per persona"""
         people_data = defaultdict(lambda: {'baseline': None, 'mental_stress': None, 'physical_stress': None})
@@ -60,6 +69,7 @@ class ECGDataLoader:
             people_data[entry['person_id']][entry['label']] = entry['signal']
         return people_data
 
+    # Genera sequenze di dati per l'addestramento
     def generate_sequences(self, signal):
         """Crea sequenze input-target (shift di 1 campione)"""
         X, y = [], []
@@ -69,6 +79,7 @@ class ECGDataLoader:
             y.append(signal[i+1:i+seq_len+1])
         return np.array(X), np.array(y)
 
+    # Costruisce i dataset per l'addestramento e il test
     def build_datasets(self):
         """Costruisce dataset baseline (train e test) e stress (anomali)"""
         all_data = self.load_signals()
