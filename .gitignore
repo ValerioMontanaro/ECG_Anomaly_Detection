@@ -1,0 +1,16 @@
+# Ambienti virtuali
+venv/
+
+# Cartella
+content/
+
+# File Python compilati
+__pycache__/
+*.pyc
+
+# File modelli e pesi
+*.h5
+
+# File vari temporanei
+*.log
+*.tmp
